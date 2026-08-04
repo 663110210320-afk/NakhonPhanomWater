@@ -1,0 +1,121 @@
+<!doctype html>
+<html lang="th">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ระบบติดตามระดับน้ำและปริมาณฝน จังหวัดนครพนม</title>
+    <meta name="description" content="ระบบติดตามระดับน้ำ ปริมาณฝนสะสม และเตือนภัยอุทกภัยล่วงหน้า จังหวัดนครพนม" />
+    <style>
+      body {
+        margin: 0;
+        padding: 0;
+        background-color: #0b0f19;
+        color: #f8fafc;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Prompt", sans-serif;
+      }
+      #file-protocol-guide {
+        display: none;
+        min-height: 100vh;
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+        box-sizing: border-box;
+      }
+      .guide-card {
+        background: #131b2e;
+        border: 1px solid #1e293b;
+        border-radius: 24px;
+        padding: 36px 28px;
+        max-width: 520px;
+        width: 100%;
+        text-align: center;
+        box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7);
+      }
+      .guide-icon {
+        font-size: 48px;
+        margin-bottom: 12px;
+      }
+      .guide-title {
+        font-size: 20px;
+        font-weight: 800;
+        color: #38bdf8;
+        margin: 0 0 10px 0;
+      }
+      .guide-desc {
+        font-size: 14px;
+        color: #94a3b8;
+        line-height: 1.6;
+        margin: 0 0 24px 0;
+      }
+      .btn-open {
+        display: inline-block;
+        background: linear-gradient(135deg, #0284c7, #2563eb);
+        color: #ffffff;
+        text-decoration: none;
+        font-weight: 700;
+        font-size: 16px;
+        padding: 14px 28px;
+        border-radius: 14px;
+        box-shadow: 0 10px 25px -5px rgba(2, 132, 199, 0.5);
+        transition: transform 0.2s, background 0.2s;
+      }
+      .btn-open:hover {
+        transform: translateY(-2px);
+        background: linear-gradient(135deg, #0369a1, #1d4ed8);
+      }
+      .guide-steps {
+        margin-top: 24px;
+        text-align: left;
+        background: #090d16;
+        border-radius: 14px;
+        padding: 16px;
+        font-size: 12px;
+        color: #cbd5e1;
+        border: 1px solid #1e293b;
+      }
+      .guide-steps ol {
+        margin: 0;
+        padding-left: 20px;
+      }
+      .guide-steps li {
+        margin-bottom: 6px;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Fallback display when opened via file:// protocol -->
+    <div id="file-protocol-guide">
+      <div class="guide-card">
+        <div class="guide-icon">🌊</div>
+        <h1 class="guide-title">ระบบติดตามระดับน้ำและปริมาณฝน นครพนม</h1>
+        <p class="guide-desc">
+          คุณกำลังเปิดไฟล์ผ่าน File Explorer (file://)<br />
+          กรุณาเข้าใช้งานผ่านเว็บเซิร์ฟเวอร์ที่ <strong>http://localhost:3000</strong>
+        </p>
+        <a href="http://localhost:3000" class="btn-open">🚀 คลิกที่นี่เพื่อเปิดเว็บไซต์</a>
+
+        <div class="guide-steps">
+          <strong>💡 หากคลิกแล้วหน้าเว็บยังไม่ขึ้น:</strong>
+          <ol>
+            <li>ดับเบิลคลิกไฟล์ <code>เปิดระบบติดตามระดับน้ำ.bat</code> ในโฟลเดอร์นี้</li>
+            <li>หรือเปิดเบราว์เซอร์แล้วพิมพ์ <code>http://localhost:3000</code></li>
+          </ol>
+        </div>
+      </div>
+    </div>
+
+    <!-- Main React root container -->
+    <div id="root"></div>
+
+    <script>
+      if (window.location.protocol === 'file:') {
+        document.getElementById('file-protocol-guide').style.display = 'flex';
+        // Try auto-navigating if browser allows
+        try {
+          window.location.href = 'http://localhost:3000';
+        } catch (e) {}
+      }
+    </script>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>

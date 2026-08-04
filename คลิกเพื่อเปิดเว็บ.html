@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>กำลังเปิดระบบติดตามระดับน้ำ นครพนม...</title>
+  <meta http-equiv="refresh" content="1; url=http://localhost:3000">
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Prompt', 'Segoe UI', Roboto, sans-serif;
+      background: #090d16;
+      color: #ffffff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      margin: 0;
+      padding: 20px;
+      box-sizing: border-box;
+    }
+    .card {
+      background: #111827;
+      border: 1px solid #1f2937;
+      border-radius: 24px;
+      padding: 40px 32px;
+      max-width: 480px;
+      width: 100%;
+      text-align: center;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7);
+    }
+    .icon {
+      font-size: 48px;
+      margin-bottom: 16px;
+      animation: bounce 2s infinite;
+    }
+    @keyframes bounce {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-8px); }
+    }
+    h1 {
+      font-size: 20px;
+      font-weight: 800;
+      margin: 0 0 8px 0;
+      color: #38bdf8;
+    }
+    p {
+      color: #94a3b8;
+      font-size: 14px;
+      line-height: 1.6;
+      margin: 0 0 24px 0;
+    }
+    .btn {
+      display: inline-block;
+      background: linear-gradient(135deg, #0284c7, #2563eb);
+      color: #ffffff;
+      text-decoration: none;
+      font-weight: 700;
+      font-size: 16px;
+      padding: 14px 28px;
+      border-radius: 14px;
+      box-shadow: 0 10px 20px -5px rgba(2, 132, 199, 0.5);
+      transition: all 0.2s;
+    }
+    .btn:hover {
+      background: linear-gradient(135deg, #0369a1, #1d4ed8);
+      transform: translateY(-2px);
+    }
+    .note {
+      font-size: 12px;
+      color: #64748b;
+      margin-top: 20px;
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <div class="icon">🌊</div>
+    <h1>ระบบติดตามระดับน้ำและปริมาณฝน</h1>
+    <p>กำลังนำท่านเข้าสู่ระบบที่ <strong>http://localhost:3000</strong> โดยอัตโนมัติ...</p>
+    <a href="http://localhost:3000" class="btn">คลิกที่นี่เพื่อเข้าสู่ระบบทันที</a>
+    <div class="note">
+      * ระบบเว็บแอปพลิเคชันจำเป็นต้องเปิดผ่าน Web Server (localhost:3000)
+    </div>
+  </div>
+</body>
+</html>

@@ -1,0 +1,6 @@
+{
+  "name": "ระบบติดตามและแจ้งเตือนระดับน้ำ นครพนม",
+  "description": "ระบบแดชบอร์ดแสดงระดับน้ำในจังหวัดนครพนม พร้อมแผนที่ การ์ดสถานะ กราฟแนวโน้ม และระบบแจ้งเตือนระดับน้ำเกินมาตรฐาน",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
