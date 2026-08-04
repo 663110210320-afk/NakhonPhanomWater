@@ -24,6 +24,7 @@ interface NavbarProps {
   dataMode: 'real' | 'sim';
   isLoadingRealData: boolean;
   onToggleDataMode: () => void;
+  onOpenForecast: () => void;
 }
 
 export const Navbar: React.FC<NavbarProps> = ({
@@ -41,6 +42,7 @@ export const Navbar: React.FC<NavbarProps> = ({
   dataMode,
   isLoadingRealData,
   onToggleDataMode,
+  onOpenForecast,
 }) => {
   const totalRain = stations.reduce((sum, s) => sum + (s.rainfall24h || 0), 0);
   const avgRain = stations.length > 0 ? (totalRain / stations.length).toFixed(1) : '0';

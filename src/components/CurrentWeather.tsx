@@ -3,6 +3,7 @@ import { Sun, Moon, Cloud, CloudRain, CloudLightning, Wind } from 'lucide-react'
 
 interface CurrentWeatherProps {
   isDarkMode: boolean;
+  onOpenForecast: () => void;
 }
 
 interface WeatherData {
@@ -11,7 +12,7 @@ interface WeatherData {
   is_day: number;
 }
 
-export const CurrentWeather: React.FC<CurrentWeatherProps> = ({ isDarkMode }) => {
+export const CurrentWeather: React.FC<CurrentWeatherProps> = ({ isDarkMode, onOpenForecast }) => {
   const [weather, setWeather] = useState<WeatherData | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -69,11 +70,17 @@ export const CurrentWeather: React.FC<CurrentWeatherProps> = ({ isDarkMode }) =>
   };
 
   return (
-    <div className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full border shadow-sm transition-colors ${
-      isDarkMode ? 'bg-slate-900 border-slate-700 text-slate-200' : 'bg-white border-slate-200 text-slate-700'
-    }`}>
+    <button 
+      onClick={onOpenForecast}
+      className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full border shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-md cursor-pointer ${
+        isDarkMode 
+          ? 'bg-slate-900 border-slate-700 text-slate-200 hover:border-amber-500/50' 
+          : 'bg-white border-slate-200 text-slate-700 hover:border-amber-400/50'
+      }`}
+      title="คลิกเพื่อดูพยากรณ์อากาศ 7 วันล่วงหน้า"
+    >
       {getWeatherIcon()}
       <span className="text-xs font-bold">{Math.round(weather.temperature)}°C</span>
-    </div>
+    </button>
   );
 };

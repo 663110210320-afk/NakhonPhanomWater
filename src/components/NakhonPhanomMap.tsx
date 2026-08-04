@@ -150,6 +150,29 @@ export const NakhonPhanomMap: React.FC<NakhonPhanomMapProps> = ({
   const [showRainStations, setShowRainStations] = React.useState<boolean>(false);
   const [showPm25Stations, setShowPm25Stations] = React.useState<boolean>(false);
   const [showDamStations, setShowDamStations] = React.useState<boolean>(false);
+  const [showRadar, setShowRadar] = React.useState<boolean>(false);
+  const [radarPath, setRadarPath] = React.useState<string | null>(null);
+
+  useEffect(() => {
+    // Fetch latest RainViewer radar timestamp
+    const fetchRadar = async () => {
+      try {
+        const res = await fetch('https://api.rainviewer.com/public/weather-maps.json');
+        const data = await res.json();
+        if (data && data.radar && data.radar.past && data.radar.past.length > 0) {
+          // Get the latest past radar frame
+          const latestFrame = data.radar.past[data.radar.past.length - 1];
+          setRadarPath(latestFrame.path);
+        }
+      } catch (err) {
+        console.error('Failed to fetch RainViewer data:', err);
+      }
+    };
+    fetchRadar();
+    // Refresh radar every 10 minutes
+    const interval = setInterval(fetchRadar, 10 * 60 * 1000);
+    return () => clearInterval(interval);
+  }, []);
 
   let mapTileUrl = '';
   let mapAttribution = '';
@@ -270,6 +293,17 @@ export const NakhonPhanomMap: React.FC<NakhonPhanomMapProps> = ({
               🛢️ แสดงข้อมูลอ่างเก็บน้ำ
             </span>
           </label>
+          <label className="flex items-center gap-2 cursor-pointer mt-2">
+            <input 
+              type="checkbox" 
+              checked={showRadar}
+              onChange={(e) => setShowRadar(e.target.checked)}
+              className="w-4 h-4 rounded text-indigo-500 focus:ring-indigo-500 bg-slate-100 border-slate-300"
+            />
+            <span className={`text-sm font-medium ${isDarkMode ? 'text-slate-200' : 'text-slate-700'}`}>
+              ⛈️ แสดงเรดาร์เมฆพายุฝน
+            </span>
+          </label>
         </div>
 
 
@@ -287,6 +321,17 @@ export const NakhonPhanomMap: React.FC<NakhonPhanomMapProps> = ({
             attribution={mapAttribution}
             url={mapTileUrl}
           />
+          
+          {/* RainViewer Storm Clouds Layer */}
+          {showRadar && radarPath && (
+            <TileLayer
+              url={`https://tilecache.rainviewer.com${radarPath}/256/{z}/{x}/{y}/2/1_1.png`}
+              attribution="&copy; <a href='https://rainviewer.com'>RainViewer</a>"
+              opacity={0.7}
+              zIndex={10}
+            />
+          )}
+
           <MapController selectedStation={selectedStation} stations={stations} selectedDistrict={selectedDistrict} />
           
           {showWaterStations && stations.map(st => (

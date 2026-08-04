@@ -16,6 +16,7 @@ import { Navbar } from './components/Navbar';
 import { SummaryStats } from './components/SummaryStats';
 import { StationCardGrid } from './components/StationCardGrid';
 import { DamModal } from './components/DamModal';
+import { WeatherForecastModal } from './components/WeatherForecastModal';
 import { NakhonPhanomMap } from './components/NakhonPhanomMap';
 import { StationDetailModal } from './components/StationDetailModal';
 import { AlertNotificationDrawer } from './components/AlertNotificationDrawer';
@@ -214,6 +215,7 @@ export default function App() {
   const [isRainfallModalOpen, setIsRainfallModalOpen] = useState<boolean>(false);
   const [isDamModalOpen, setIsDamModalOpen] = useState<boolean>(false);
   const [isWarningModalOpen, setIsWarningModalOpen] = useState<boolean>(false);
+  const [isForecastModalOpen, setIsForecastModalOpen] = useState<boolean>(false);
 
   // Sound Siren Helper
   const triggerAudioSiren = useCallback((severity: 'warning' | 'critical') => {
@@ -458,6 +460,7 @@ export default function App() {
             fetchRealData();
           }
         }}
+        onOpenForecast={() => setIsForecastModalOpen(true)}
       />
 
       {/* Main Container */}
@@ -698,6 +701,13 @@ export default function App() {
         damStations={damStations}
         isDarkMode={isDarkMode}
         districts={NAKHON_PHANOM_DISTRICTS}
+      />
+
+      {/* Weather Forecast Modal */}
+      <WeatherForecastModal
+        isOpen={isForecastModalOpen}
+        onClose={() => setIsForecastModalOpen(false)}
+        isDarkMode={isDarkMode}
       />
 
     </div>
