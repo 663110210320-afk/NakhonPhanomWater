@@ -19,7 +19,6 @@ import { DamModal } from './components/DamModal';
 import { WeatherForecastModal } from './components/WeatherForecastModal';
 import { NakhonPhanomMap } from './components/NakhonPhanomMap';
 import { StationDetailModal } from './components/StationDetailModal';
-import { AlertNotificationDrawer } from './components/AlertNotificationDrawer';
 import { SimulationControlBar } from './components/SimulationControlBar';
 import { RainfallSourcesModal } from './components/RainfallSourcesModal';
 import { NakhonPhanomRainModal } from './components/NakhonPhanomRainModal';
@@ -36,46 +35,6 @@ export default function App() {
   const [selectedDistrict, setSelectedDistrict] = useState<string>('ทั้งหมด');
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [lastUpdated, setLastUpdated] = useState<Date>(new Date());
-
-  // Alerts state
-  const [alerts, setAlerts] = useState<WaterAlert[]>([
-    {
-      id: 'alt-init-1',
-      stationId: 'st-01',
-      stationName: 'สถานี M.7 เมืองนครพนม',
-      district: 'เมืองนครพนม',
-      severity: 'critical',
-      waterLevel: 11.85,
-      bankLevel: 12.00,
-      message: 'ระดับน้ำโขงหน้าตลาดอินโดจีน สูงถึง 11.85 ม. (ตลิ่ง 12.00 ม.) เข้าขั้นวิกฤต/ล้นตลิ่ง',
-      timestamp: '10 นาทีที่แล้ว',
-      isRead: false,
-    },
-    {
-      id: 'alt-init-2',
-      stationId: 'st-05',
-      stationName: 'สถานีศรีสงคราม (ปากอูน)',
-      district: 'ศรีสงคราม',
-      severity: 'critical',
-      waterLevel: 12.10,
-      bankLevel: 12.50,
-      message: 'ลำน้ำสงครามและลำน้ำอูนหนุนสูงล้นตลิ่ง เอ่อท่วมพื้นที่การเกษตรริมน้ำ',
-      timestamp: '25 นาทีที่แล้ว',
-      isRead: false,
-    },
-  ]);
-
-  const [alertSettings, setAlertSettings] = useState<AlertSetting>({
-    soundEnabled: true,
-    autoNotification: true,
-    watchThresholdPct: 70,
-    warningThresholdPct: 85,
-    criticalThresholdPct: 95,
-    notifyLine: true,
-    notifySms: true,
-  });
-
-  const [soundEnabled, setSoundEnabled] = useState<boolean>(true);
 
   // Simulation State
   const [simConfig, setSimConfig] = useState<SimulationConfig>({
@@ -152,77 +111,12 @@ export default function App() {
     }
   }, [dataMode, fetchRealData]);
 
-  // Synchronize alerts automatically based on current station data & threshold settings
-  useEffect(() => {
-    if (!stations || stations.length === 0) return;
-
-    setAlerts((prevAlerts) => {
-      const readMap = new Map<string, boolean>();
-      prevAlerts.forEach((a) => {
-        readMap.set(a.stationId, a.isRead);
-      });
-
-      const updatedAlertsList: WaterAlert[] = [];
-
-      stations.forEach((st) => {
-        const pct = getWaterLevelPercent(st);
-
-        let severity: WaterStatus | null = null;
-        let message = '';
-
-        if (st.status === 'critical' || pct >= alertSettings.criticalThresholdPct || st.currentLevel >= st.bankLevel) {
-          severity = 'critical';
-          message = `🚨 สัญญาณวิกฤต/ล้นตลิ่ง! ${st.name} (อ.${st.district}) ระดับน้ำ ${st.currentLevel.toFixed(2)} ม. (${pct}% ของตลิ่ง ${st.bankLevel.toFixed(2)} ม.)`;
-        } else if (st.status === 'warning' || pct >= alertSettings.warningThresholdPct) {
-          severity = 'warning';
-          message = `⚠️ เตือนภัยระดับน้ำสูง! ${st.name} (อ.${st.district}) ระดับน้ำอยู่ที่ ${st.currentLevel.toFixed(2)} ม. (${pct}%)`;
-        } else if (st.status === 'watch' || pct >= alertSettings.watchThresholdPct) {
-          severity = 'watch';
-          message = `🟡 แจ้งเตือนเฝ้าระวัง! ${st.name} (อ.${st.district}) ระดับน้ำอยู่ที่ ${st.currentLevel.toFixed(2)} ม. (${pct}%)`;
-        } else if (pct <= 10) {
-          severity = 'watch';
-          message = `🟣 แจ้งเตือนเฝ้าระวังน้ำน้อยวิกฤต! ${st.name} (อ.${st.district}) ระดับน้ำอยู่ที่ ${st.currentLevel.toFixed(2)} ม. (${pct}%)`;
-        }
-
-        if (severity) {
-          const isAlreadyRead = readMap.get(st.id) ?? false;
-          updatedAlertsList.push({
-            id: `alt-${st.id}`,
-            stationId: st.id,
-            stationName: st.name,
-            district: st.district,
-            severity,
-            waterLevel: st.currentLevel,
-            bankLevel: st.bankLevel,
-            message,
-            timestamp: st.lastUpdated || 'อัปเดตล่าสุด',
-            isRead: isAlreadyRead,
-          });
-        }
-      });
-
-      // Priority ordering: critical -> warning -> watch
-      const severityPriority: Record<string, number> = { critical: 1, warning: 2, watch: 3, normal: 4 };
-      updatedAlertsList.sort((a, b) => severityPriority[a.severity] - severityPriority[b.severity]);
-
-      return updatedAlertsList;
-    });
-  }, [stations, alertSettings.criticalThresholdPct, alertSettings.warningThresholdPct, alertSettings.watchThresholdPct]);
-
   // Modal Visibility States
-  const [isAlertDrawerOpen, setIsAlertDrawerOpen] = useState<boolean>(false);
   const [isSimModalOpen, setIsSimModalOpen] = useState<boolean>(false);
   const [isRainfallModalOpen, setIsRainfallModalOpen] = useState<boolean>(false);
   const [isDamModalOpen, setIsDamModalOpen] = useState<boolean>(false);
   const [isWarningModalOpen, setIsWarningModalOpen] = useState<boolean>(false);
   const [isForecastModalOpen, setIsForecastModalOpen] = useState<boolean>(false);
-
-  // Sound Siren Helper
-  const triggerAudioSiren = useCallback((severity: 'warning' | 'critical') => {
-    if (soundEnabled) {
-      playAlertSiren(severity);
-    }
-  }, [soundEnabled]);
 
   // Handle station water level update (Manual adjustment or Simulation tick)
   const updateStationLevel = useCallback(
@@ -240,30 +134,6 @@ export default function App() {
           );
 
           const trend = newLevel > st.currentLevel ? 'rising' : newLevel < st.currentLevel ? 'falling' : 'steady';
-
-          // If status escalated to warning or critical, push new alert
-          if (newStatus !== oldStatus && (newStatus === 'warning' || newStatus === 'critical')) {
-            const timeStr = new Date().toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit' });
-
-            const newAlert: WaterAlert = {
-              id: `alt-${Date.now()}-${st.id}`,
-              stationId: st.id,
-              stationName: st.name,
-              district: st.district,
-              severity: newStatus,
-              waterLevel: newLevel,
-              bankLevel: st.bankLevel,
-              message:
-                newStatus === 'critical'
-                  ? `🚨 สัญญาณเตือนระดับวิกฤต! ${st.name} ระดับน้ำสูง ${newLevel.toFixed(2)} ม. (ตลิ่ง ${st.bankLevel} ม.)`
-                  : `⚠️ สัญญาณเตือนภัย! ${st.name} ระดับน้ำเพิ่มขึ้นเป็น ${newLevel.toFixed(2)} ม.`,
-              timestamp: timeStr,
-              isRead: false,
-            };
-
-            setAlerts((prevAlerts) => [newAlert, ...prevAlerts]);
-            triggerAudioSiren(newStatus);
-          }
 
           // Append to history
           const updatedHistory = [
@@ -287,7 +157,7 @@ export default function App() {
       );
       setLastUpdated(new Date());
     },
-    [triggerAudioSiren]
+    []
   );
 
   // Simulation Interval Tick
@@ -536,13 +406,6 @@ export default function App() {
             </div>
 
             <div className="flex flex-wrap items-center gap-2 self-end sm:self-auto">
-
-              <button
-                onClick={() => setIsAlertDrawerOpen(true)}
-                className="px-3 py-1.5 rounded-xl bg-white text-rose-700 hover:bg-rose-50 text-xs font-bold shadow-md transition-all"
-              >
-                ดูรายการเตือนภัย
-              </button>
             </div>
           </div>
         )}
@@ -658,21 +521,6 @@ export default function App() {
       <StationDetailModal
         station={selectedStation}
         onClose={() => setSelectedStation(null)}
-      />
-
-      {/* Alert Notification Drawer */}
-      <AlertNotificationDrawer
-        isOpen={isAlertDrawerOpen}
-        onClose={() => setIsAlertDrawerOpen(false)}
-        alerts={alerts}
-        onClearAlerts={() => setAlerts([])}
-        onMarkAsRead={(id) =>
-          setAlerts((prev) => prev.map((a) => (a.id === id ? { ...a, isRead: true } : a)))
-        }
-        settings={alertSettings}
-        onUpdateSettings={setAlertSettings}
-        stations={stations}
-        onOpenWarningModal={() => setIsWarningModalOpen(true)}
       />
 
       {/* Simulation Control Modal */}

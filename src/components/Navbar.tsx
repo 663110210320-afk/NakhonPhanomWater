@@ -8,10 +8,6 @@ import { CurrentWeather } from './CurrentWeather';
 
 interface NavbarProps {
   stations: WaterStation[];
-  soundEnabled: boolean;
-  onToggleSound: () => void;
-  unreadAlertCount: number;
-  onOpenAlerts: () => void;
   onOpenRainModal: () => void;
 
   onOpenSimModal: () => void;
@@ -29,10 +25,6 @@ interface NavbarProps {
 
 export const Navbar: React.FC<NavbarProps> = ({
   stations,
-  soundEnabled,
-  onToggleSound,
-  unreadAlertCount,
-  onOpenAlerts,
   onOpenRainModal,
 
   onOpenSimModal,
@@ -134,17 +126,6 @@ export const Navbar: React.FC<NavbarProps> = ({
 
             <div className={`w-px h-6 mx-1 ${isDarkMode ? 'bg-slate-800' : 'bg-slate-200'}`}></div>
 
-            {/* Audio Toggle */}
-            <button
-              onClick={onToggleSound}
-              className={`p-2 rounded-lg transition-colors ${
-                isDarkMode ? 'hover:bg-slate-800 text-slate-300' : 'hover:bg-slate-100 text-slate-600'
-              }`}
-              title={soundEnabled ? 'ปิดเสียงเตือน' : 'เปิดเสียงเตือน'}
-            >
-              {soundEnabled ? <Volume2 className="w-5 h-5" /> : <VolumeX className="w-5 h-5 opacity-50" />}
-            </button>
-
             {/* Theme Toggle */}
             <button
               onClick={onToggleTheme}
@@ -154,19 +135,6 @@ export const Navbar: React.FC<NavbarProps> = ({
               title="เปลี่ยนธีม"
             >
               {isDarkMode ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
-            </button>
-
-            {/* Alert Bell */}
-            <button
-              onClick={onOpenAlerts}
-              className={`relative p-2 rounded-lg transition-colors ${
-                isDarkMode ? 'hover:bg-slate-800 text-slate-300' : 'hover:bg-slate-100 text-slate-600'
-              }`}
-            >
-              <Bell className="w-5 h-5" />
-              {unreadAlertCount > 0 && (
-                <span className="absolute top-1.5 right-1.5 w-2.5 h-2.5 bg-rose-500 rounded-full animate-pulse ring-2 ring-white dark:ring-slate-900"></span>
-              )}
             </button>
 
           </div>
