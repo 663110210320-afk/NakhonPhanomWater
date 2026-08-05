@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { WaterStation, getWaterCategory, getWaterLevelPercent, getRainfallCategory } from '../types';
-import { X, MapPin, Activity, Droplets, ArrowUpRight, ArrowDownRight, Minus, AlertTriangle, ShieldAlert } from 'lucide-react';
+import { X, MapPin, Activity, Droplets, ArrowUpRight, ArrowDownRight, Minus, AlertTriangle, ShieldAlert, Bot, Sparkles, Loader2, RefreshCw } from 'lucide-react';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, ReferenceLine } from 'recharts';
 import { motion, AnimatePresence } from 'motion/react';
 
@@ -11,6 +11,32 @@ interface StationDetailModalProps {
 
 export const StationDetailModal: React.FC<StationDetailModalProps> = ({ station, onClose }) => {
   const [timeRange, setTimeRange] = useState<'24h' | '7d' | '30d'>('24h');
+  const [isPredicting, setIsPredicting] = useState(false);
+  const [prediction, setPrediction] = useState<string | null>(null);
+  const [predictionError, setPredictionError] = useState<string | null>(null);
+
+  const handleAiPredict = async () => {
+    if (!station) return;
+    setIsPredicting(true);
+    setPrediction(null);
+    setPredictionError(null);
+    try {
+      const res = await fetch('/api/ai-predict', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ station })
+      });
+      const data = await res.json();
+      if (!res.ok || !data.success) {
+        throw new Error(data.error || 'การเชื่อมต่อ AI ล้มเหลว (ตรวจสอบ API Key)');
+      }
+      setPrediction(data.prediction);
+    } catch (err: any) {
+      setPredictionError(err.message);
+    } finally {
+      setIsPredicting(false);
+    }
+  };
 
   if (!station) return null;
 
@@ -94,6 +120,71 @@ export const StationDetailModal: React.FC<StationDetailModalProps> = ({ station,
           {/* Body */}
           <div className="p-6 overflow-y-auto custom-scrollbar flex-1 bg-slate-900">
             
+            {/* AI Prediction Button & Output */}
+            <div className="mb-8">
+              {!prediction && !isPredicting && !predictionError ? (
+                <button 
+                  onClick={handleAiPredict}
+                  className="w-full relative overflow-hidden group bg-slate-800 hover:bg-indigo-900/40 border border-slate-700 hover:border-indigo-500/50 rounded-2xl p-4 transition-all duration-300"
+                >
+                  <div className="absolute inset-0 bg-gradient-to-r from-indigo-500/10 via-purple-500/10 to-indigo-500/10 opacity-0 group-hover:opacity-100 transition-opacity" />
+                  <div className="flex items-center justify-center gap-3 relative z-10">
+                    <div className="p-2 bg-indigo-500/20 rounded-xl text-indigo-400 group-hover:scale-110 transition-transform">
+                      <Sparkles className="w-5 h-5" />
+                    </div>
+                    <span className="font-bold text-slate-300 group-hover:text-indigo-300 transition-colors">
+                      ให้ AI ประเมินความเสี่ยงน้ำท่วมล่วงหน้า (Gemini)
+                    </span>
+                  </div>
+                </button>
+              ) : (
+                <motion.div 
+                  initial={{ opacity: 0, height: 0 }}
+                  animate={{ opacity: 1, height: 'auto' }}
+                  className={`relative overflow-hidden rounded-2xl border ${predictionError ? 'bg-rose-950/20 border-rose-900/50' : 'bg-indigo-950/20 border-indigo-900/50'} p-5`}
+                >
+                  {isPredicting ? (
+                    <div className="flex items-center gap-4 text-indigo-400">
+                      <Loader2 className="w-6 h-6 animate-spin" />
+                      <div>
+                        <p className="font-bold">AI กำลังวิเคราะห์ข้อมูลพยากรณ์...</p>
+                        <p className="text-xs opacity-70">ประมวลผลสถิติและแบบจำลองสภาพอากาศ</p>
+                      </div>
+                    </div>
+                  ) : predictionError ? (
+                    <div className="flex items-start gap-4 text-rose-400">
+                      <AlertTriangle className="w-6 h-6 shrink-0 mt-0.5" />
+                      <div>
+                        <p className="font-bold text-rose-300">ไม่สามารถวิเคราะห์ได้</p>
+                        <p className="text-sm mt-1 opacity-80">{predictionError}</p>
+                        <button onClick={handleAiPredict} className="mt-3 px-3 py-1.5 bg-rose-900/40 hover:bg-rose-900/60 rounded-lg text-xs font-bold transition-colors">
+                          ลองใหม่อีกครั้ง
+                        </button>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="flex items-start gap-4">
+                      <div className="p-2 bg-indigo-500/20 rounded-xl text-indigo-400 shrink-0 mt-1">
+                        <Bot className="w-6 h-6" />
+                      </div>
+                      <div className="flex-1">
+                        <div className="flex items-center justify-between mb-2">
+                          <h4 className="font-bold text-indigo-300">Gemini AI Analysis</h4>
+                          <span className="text-[10px] uppercase tracking-wider font-bold bg-indigo-500/20 text-indigo-400 px-2 py-0.5 rounded">BETA</span>
+                        </div>
+                        <div className="text-sm text-slate-300 leading-relaxed whitespace-pre-wrap">
+                          {prediction}
+                        </div>
+                        <button onClick={handleAiPredict} className="mt-4 flex items-center gap-1.5 text-xs font-bold text-indigo-400 hover:text-indigo-300 transition-colors">
+                          <RefreshCw className="w-3 h-3" /> วิเคราะห์ใหม่
+                        </button>
+                      </div>
+                    </div>
+                  )}
+                </motion.div>
+              )}
+            </div>
+
             {/* KPI Cards */}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
               <div className="bg-slate-800/50 rounded-2xl p-4 border border-slate-700/50">
