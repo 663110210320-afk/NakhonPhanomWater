@@ -97,8 +97,21 @@ const createDamIcon = () => {
 // Component to handle map zooming to selected station
 const MapController = ({ selectedStation, stations, selectedDistrict }: any) => {
   const map = useMap();
+  const prevStation = React.useRef(selectedStation);
+  const prevDistrict = React.useRef(selectedDistrict);
 
   useEffect(() => {
+    if (selectedStation === prevStation.current && selectedDistrict === prevDistrict.current) {
+      // Initialize map center on first mount if nothing is selected
+      if (!prevStation.current && prevDistrict.current === 'ทั้งหมด' && map.getZoom() === undefined) {
+          map.setView([17.4, 104.5], 9, { animate: false });
+      }
+      return;
+    }
+
+    prevStation.current = selectedStation;
+    prevDistrict.current = selectedDistrict;
+
     if (selectedStation && selectedStation.latitude && selectedStation.longitude) {
       map.setView([selectedStation.latitude, selectedStation.longitude], 13, {
         animate: true,
@@ -115,7 +128,7 @@ const MapController = ({ selectedStation, stations, selectedDistrict }: any) => 
       // Nakhon Phanom general center
       map.setView([17.4, 104.5], 9, { animate: true, duration: 1 });
     }
-  }, [selectedStation, selectedDistrict, map, stations]);
+  }, [selectedStation, selectedDistrict, map]); // Removed stations from dependency array
 
   return null;
 };
@@ -316,9 +329,10 @@ export const NakhonPhanomMap: React.FC<NakhonPhanomMapProps> = ({
           zoom={9} 
           scrollWheelZoom={true}
           zoomAnimation={true}
-          zoomSnap={0.1}
+          zoomSnap={0}
           zoomDelta={0.5}
-          wheelPxPerZoomLevel={100}
+          wheelPxPerZoomLevel={60}
+          wheelDebounceTime={40}
           className="w-full h-full z-0"
         >
           <TileLayer
