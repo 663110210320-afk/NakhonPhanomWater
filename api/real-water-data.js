@@ -108,6 +108,12 @@ export default async function handler(req, res) {
 
       const warningLevel = Number((bankLevel * 0.85).toFixed(2));
 
+      // Calculate average rainfall for this district
+      const districtRainStations = mappedRainStations.filter(r => r.district === district);
+      const avgRainfall = districtRainStations.length > 0 
+        ? districtRainStations.reduce((sum, r) => sum + r.rainfall24h, 0) / districtRainStations.length 
+        : 0;
+
       let status = 'normal';
       if (currentLevel >= bankLevel) {
         status = 'critical';
@@ -115,6 +121,14 @@ export default async function handler(req, res) {
         status = 'warning';
       } else if (currentLevel >= bankLevel * 0.7) {
         status = 'watch';
+      }
+
+      // Elevate status based on heavy rainfall
+      if (avgRainfall >= 90.1) { // Very heavy rain
+         if (status === 'warning' || status === 'watch') status = 'critical';
+         else if (status === 'normal') status = 'warning';
+      } else if (avgRainfall >= 35.1) { // Heavy rain
+         if (status === 'watch') status = 'warning';
       }
 
       const trendMod = status === 'critical' ? 0.05 : status === 'warning' ? 0.02 : -0.01;
@@ -135,6 +149,7 @@ export default async function handler(req, res) {
         lastUpdated: item.waterlevel_datetime || new Date().toLocaleString("th-TH"),
         latitude: Number(item.station?.tele_station_lat || item.station?.station_lat || 0),
         longitude: Number(item.station?.tele_station_long || item.station?.station_long || 0),
+        rainfall24h: Number(avgRainfall.toFixed(1)),
         flowRate: 0,
         trend: 'stable',
         hourlyHistory,
