@@ -97,7 +97,7 @@ export const Navbar: React.FC<NavbarProps> = ({
 
 
             {/* Current Weather (Temp) */}
-            <CurrentWeather isDarkMode={isDarkMode} />
+            <CurrentWeather isDarkMode={isDarkMode} onOpenForecast={onOpenForecast} />
 
             {/* Rain Info Button */}
             <button
