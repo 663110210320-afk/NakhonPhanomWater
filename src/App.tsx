@@ -278,26 +278,6 @@ export default function App() {
     }
   };
 
-  const handleTestStationAlert = (station: WaterStation) => {
-    playAlertSiren(station.status === 'critical' ? 'critical' : 'warning');
-    const newAlert: WaterAlert = {
-      id: `alt-test-${Date.now()}`,
-      stationId: station.id,
-      stationName: station.name,
-      district: station.district,
-      severity: station.status,
-      waterLevel: station.currentLevel,
-      bankLevel: station.bankLevel,
-      message: `🔔 ทดสอบส่งสัญญาณไซเรนเตือนภัยประจำสถานี ${station.name}`,
-      timestamp: 'เมื่อสักครู่',
-      isRead: false,
-    };
-    setAlerts((prev) => [newAlert, ...prev]);
-    setIsAlertDrawerOpen(true);
-  };
-
-  const unreadAlertCount = alerts.filter((a) => !a.isRead).length;
-
   return (
     <div className={`min-h-screen font-sans transition-colors duration-200 pb-16 ${
       isDarkMode
@@ -307,10 +287,6 @@ export default function App() {
       {/* Top Navigation */}
       <Navbar
         stations={stations}
-        soundEnabled={soundEnabled}
-        onToggleSound={() => setSoundEnabled(!soundEnabled)}
-        unreadAlertCount={unreadAlertCount}
-        onOpenAlerts={() => setIsAlertDrawerOpen(true)}
         onOpenRainModal={() => setIsRainfallModalOpen(true)}
 
         onOpenSimModal={() => setIsSimModalOpen(true)}
