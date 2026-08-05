@@ -315,6 +315,10 @@ export const NakhonPhanomMap: React.FC<NakhonPhanomMapProps> = ({
           center={[17.4, 104.5]} 
           zoom={9} 
           scrollWheelZoom={true}
+          zoomAnimation={true}
+          zoomSnap={0.1}
+          zoomDelta={0.5}
+          wheelPxPerZoomLevel={100}
           className="w-full h-full z-0"
         >
           <TileLayer
