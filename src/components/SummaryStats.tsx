@@ -9,6 +9,7 @@ interface SummaryStatsProps {
   isDarkMode: boolean;
   onOpenRainfallModal: () => void;
   onOpenDamModal: () => void;
+  onOpenRiskInfo?: (topic: 'water' | 'rain' | 'pm25' | 'dam') => void;
 }
 
 export const SummaryStats: React.FC<SummaryStatsProps> = ({ 
@@ -17,7 +18,8 @@ export const SummaryStats: React.FC<SummaryStatsProps> = ({
   damStations = [],
   isDarkMode,
   onOpenRainfallModal,
-  onOpenDamModal
+  onOpenDamModal,
+  onOpenRiskInfo
 }) => {
   const total = stations.length;
   const critical = stations.filter(s => s.status === 'critical').length;
@@ -29,10 +31,11 @@ export const SummaryStats: React.FC<SummaryStatsProps> = ({
   const avgRain = rainStations.length > 0 ? (totalRain / rainStations.length).toFixed(1) : '0';
 
   const Card = ({ 
-    title, value, subtitle, icon, gradient, textColor, onClick, isClickable 
+    title, value, subtitle, icon, gradient, textColor, onClick, isClickable, onInfoClick 
   }: { 
     title: string; value: string | number; subtitle: string; icon: React.ReactNode; 
     gradient: string; textColor: string; onClick?: () => void; isClickable?: boolean;
+    onInfoClick?: (e: React.MouseEvent) => void;
   }) => (
     <div 
       onClick={onClick}
@@ -44,7 +47,18 @@ export const SummaryStats: React.FC<SummaryStatsProps> = ({
       <div className={`absolute -right-6 -top-6 w-24 h-24 rounded-full opacity-20 blur-2xl ${gradient}`}></div>
       
       <div className="flex justify-between items-start mb-2 relative z-10">
-        <h3 className={`text-sm font-bold ${isDarkMode ? 'text-slate-400' : 'text-slate-500'}`}>{title}</h3>
+        <div className="flex items-center gap-1.5">
+          <h3 className={`text-sm font-bold ${isDarkMode ? 'text-slate-400' : 'text-slate-500'}`}>{title}</h3>
+          {onInfoClick && (
+            <button 
+              onClick={onInfoClick}
+              className={`p-0.5 rounded-full transition-colors ${isDarkMode ? 'hover:bg-slate-800 text-slate-500 hover:text-slate-300' : 'hover:bg-slate-200 text-slate-400 hover:text-slate-600'}`}
+              title="ดูเกณฑ์ความเสี่ยง"
+            >
+              <Info className="w-3.5 h-3.5" />
+            </button>
+          )}
+        </div>
         <div className={`p-2 rounded-xl bg-gradient-to-br ${gradient} text-white shadow-sm`}>
           {icon}
         </div>
@@ -89,6 +103,7 @@ export const SummaryStats: React.FC<SummaryStatsProps> = ({
         icon={<ShieldAlert className="w-5 h-5" />} 
         gradient="from-rose-500 to-red-600"
         textColor={isDarkMode ? 'text-rose-400' : 'text-rose-600'}
+        onInfoClick={(e) => { e.stopPropagation(); onOpenRiskInfo?.('water'); }}
       />
       
       {/* Rainfall specific card spanning 2 columns */}
@@ -104,7 +119,16 @@ export const SummaryStats: React.FC<SummaryStatsProps> = ({
             <CloudRain className="w-6 h-6" />
           </div>
           <div>
-            <h3 className={`text-sm font-bold ${isDarkMode ? 'text-slate-400' : 'text-slate-500'}`}>ฝนเฉลี่ย (24 ชม.)</h3>
+            <div className="flex items-center gap-1.5">
+              <h3 className={`text-sm font-bold ${isDarkMode ? 'text-slate-400' : 'text-slate-500'}`}>ฝนเฉลี่ย (24 ชม.)</h3>
+              <button 
+                onClick={(e) => { e.stopPropagation(); onOpenRiskInfo?.('rain'); }}
+                className={`p-0.5 rounded-full transition-colors ${isDarkMode ? 'hover:bg-slate-800 text-slate-500 hover:text-slate-300' : 'hover:bg-slate-200 text-slate-400 hover:text-slate-600'}`}
+                title="ดูเกณฑ์ความเสี่ยงฝน"
+              >
+                <Info className="w-3.5 h-3.5" />
+              </button>
+            </div>
             <div className="flex items-baseline gap-2">
               <span className={`text-2xl font-black ${isDarkMode ? 'text-white' : 'text-slate-900'}`}>{avgRain}</span>
               <span className={`text-sm font-bold ${isDarkMode ? 'text-slate-500' : 'text-slate-400'}`}>มม.</span>
@@ -131,7 +155,16 @@ export const SummaryStats: React.FC<SummaryStatsProps> = ({
             </svg>
           </div>
           <div>
-            <h3 className={`text-sm font-bold ${isDarkMode ? 'text-slate-400' : 'text-slate-500'}`}>ข้อมูลอ่างเก็บน้ำ ({damStations.length} แห่ง)</h3>
+            <div className="flex items-center gap-1.5">
+              <h3 className={`text-sm font-bold ${isDarkMode ? 'text-slate-400' : 'text-slate-500'}`}>ข้อมูลอ่างเก็บน้ำ ({damStations.length} แห่ง)</h3>
+              <button 
+                onClick={(e) => { e.stopPropagation(); onOpenRiskInfo?.('dam'); }}
+                className={`p-0.5 rounded-full transition-colors ${isDarkMode ? 'hover:bg-slate-800 text-slate-500 hover:text-slate-300' : 'hover:bg-slate-200 text-slate-400 hover:text-slate-600'}`}
+                title="ดูเกณฑ์ความเสี่ยงอ่างเก็บน้ำ"
+              >
+                <Info className="w-3.5 h-3.5" />
+              </button>
+            </div>
             <div className="flex items-baseline gap-2">
               <span className={`text-2xl font-black ${isDarkMode ? 'text-white' : 'text-slate-900'}`}>
                 {damStations.length > 0 

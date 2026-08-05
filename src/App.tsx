@@ -22,6 +22,7 @@ import { StationDetailModal } from './components/StationDetailModal';
 import { SimulationControlBar } from './components/SimulationControlBar';
 import { RainfallSourcesModal } from './components/RainfallSourcesModal';
 import { NakhonPhanomRainModal } from './components/NakhonPhanomRainModal';
+import { RiskCriteriaModal, RiskTopic } from './components/RiskCriteriaModal';
 
 import { playAlertSiren } from './utils/audioAlert';
 import { ShieldAlert, AlertTriangle, MapPin, Waves, RefreshCw, Search } from 'lucide-react';
@@ -117,6 +118,7 @@ export default function App() {
   const [isDamModalOpen, setIsDamModalOpen] = useState<boolean>(false);
   const [isWarningModalOpen, setIsWarningModalOpen] = useState<boolean>(false);
   const [isForecastModalOpen, setIsForecastModalOpen] = useState<boolean>(false);
+  const [riskModalTopic, setRiskModalTopic] = useState<RiskTopic>(null);
 
   // Handle station water level update (Manual adjustment or Simulation tick)
   const updateStationLevel = useCallback(
@@ -387,13 +389,14 @@ export default function App() {
         )}
 
         {/* Executive KPI Summary Cards */}
-        <SummaryStats
-          stations={stations}
+        <SummaryStats 
+          stations={stations} 
           rainStations={rainStations}
           damStations={damStations}
-          isDarkMode={isDarkMode}
+          isDarkMode={isDarkMode} 
           onOpenRainfallModal={() => setIsRainfallModalOpen(true)}
           onOpenDamModal={() => setIsDamModalOpen(true)}
+          onOpenRiskInfo={(topic) => setRiskModalTopic(topic)}
         />
 
         {/* Interactive Map Section */}
@@ -532,6 +535,14 @@ export default function App() {
       <WeatherForecastModal
         isOpen={isForecastModalOpen}
         onClose={() => setIsForecastModalOpen(false)}
+        isDarkMode={isDarkMode}
+      />
+
+      {/* Risk Criteria Info Modal */}
+      <RiskCriteriaModal
+        isOpen={riskModalTopic !== null}
+        onClose={() => setRiskModalTopic(null)}
+        topic={riskModalTopic}
         isDarkMode={isDarkMode}
       />
 
