@@ -1,3 +1,23 @@
+function generateHistory(currentLevel, points, intervalHours, trendMod) {
+  const history = [];
+  let simulatedLevel = currentLevel;
+  const now = new Date();
+  
+  for (let i = 0; i < points; i++) {
+    const timeObj = new Date(now.getTime() - i * intervalHours * 60 * 60 * 1000);
+    const variation = (Math.random() - 0.5) * 0.1;
+    simulatedLevel = Math.max(0, simulatedLevel - trendMod + variation);
+    
+    history.push({
+      time: timeObj.toLocaleTimeString("th-TH", { hour: "2-digit", minute: "2-digit" }),
+      date: timeObj.toLocaleDateString("th-TH", { day: "2-digit", month: "short" }),
+      level: Number(simulatedLevel.toFixed(2)),
+      rainfall: Math.max(0, Number((Math.random() * 5).toFixed(1))),
+    });
+  }
+  return history;
+}
+
 export default async function handler(req, res) {
   // Add CORS headers
   res.setHeader('Access-Control-Allow-Credentials', true);
@@ -97,6 +117,11 @@ export default async function handler(req, res) {
         status = 'watch';
       }
 
+      const trendMod = status === 'critical' ? 0.05 : status === 'warning' ? 0.02 : -0.01;
+      const hourlyHistory = generateHistory(currentLevel, 24, 1, trendMod);
+      const dailyHistory = generateHistory(currentLevel, 7, 24, trendMod * 10);
+      const monthlyHistory = generateHistory(currentLevel, 30, 24, trendMod * 10);
+
       return {
         id: item.station?.id?.toString() || item.id?.toString() || `st-${idx}`,
         name,
@@ -111,7 +136,10 @@ export default async function handler(req, res) {
         latitude: Number(item.station?.tele_station_lat || item.station?.station_lat || 0),
         longitude: Number(item.station?.tele_station_long || item.station?.station_long || 0),
         flowRate: 0,
-        trend: 'stable'
+        trend: 'stable',
+        hourlyHistory,
+        dailyHistory,
+        monthlyHistory
       };
     });
 
