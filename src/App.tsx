@@ -389,6 +389,7 @@ export default function App() {
         {/* Executive KPI Summary Cards */}
         <SummaryStats
           stations={stations}
+          rainStations={rainStations}
           damStations={damStations}
           isDarkMode={isDarkMode}
           onOpenRainfallModal={() => setIsRainfallModalOpen(true)}

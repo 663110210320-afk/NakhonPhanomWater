@@ -4,6 +4,7 @@ import { ShieldAlert, CheckCircle2, AlertTriangle, CloudRain, ShieldCheck, Activ
 
 interface SummaryStatsProps {
   stations: WaterStation[];
+  rainStations: any[];
   damStations: any[]; // Or import DamStation
   isDarkMode: boolean;
   onOpenRainfallModal: () => void;
@@ -12,6 +13,7 @@ interface SummaryStatsProps {
 
 export const SummaryStats: React.FC<SummaryStatsProps> = ({ 
   stations, 
+  rainStations = [],
   damStations = [],
   isDarkMode,
   onOpenRainfallModal,
@@ -23,8 +25,8 @@ export const SummaryStats: React.FC<SummaryStatsProps> = ({
   const watch = stations.filter(s => s.status === 'watch').length;
   const normal = stations.filter(s => s.status === 'normal').length;
 
-  const totalRain = stations.reduce((sum, s) => sum + (s.rainfall24h || 0), 0);
-  const avgRain = total > 0 ? (totalRain / total).toFixed(1) : '0';
+  const totalRain = rainStations.reduce((sum, s) => sum + (s.rainfall24h || 0), 0);
+  const avgRain = rainStations.length > 0 ? (totalRain / rainStations.length).toFixed(1) : '0';
 
   const Card = ({ 
     title, value, subtitle, icon, gradient, textColor, onClick, isClickable 
