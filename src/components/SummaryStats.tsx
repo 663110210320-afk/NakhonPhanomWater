@@ -1,6 +1,6 @@
 import React from 'react';
 import { WaterStation } from '../types';
-import { ShieldAlert, CheckCircle2, AlertTriangle, CloudRain, ShieldCheck, Activity } from 'lucide-react';
+import { ShieldAlert, CheckCircle2, AlertTriangle, CloudRain, ShieldCheck, Activity, Info } from 'lucide-react';
 
 interface SummaryStatsProps {
   stations: WaterStation[];
